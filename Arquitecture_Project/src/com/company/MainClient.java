@@ -43,15 +43,15 @@ public class MainClient {
     public static long distribution_gaussian(){
         //Method or algorithm to generate random numbers with a normal distribution
 
-        //In our experiment to generate values with an average of 500 and a standard deviation of 100, we call the method
+        //In our experiment to generate values with an average of 1100 and a standard deviation of 100, we call the method
         //Using nextGaussian() we scale and shift the number returned to get other normal distribution:
         // *to change the mean (average) of the distribution, we add the required value
         // *to change the standard deviation, we multiply the value.
-        //With a standard deviation of 100, this means that 70% of values will fall between 500 +/- 100,
-        //in other words between 400 and 600 milliseconds; 95% of values will fall between 300 and 700 milliseconds.
+        //With a standard deviation of 100, this means that 70% of values will fall between 1100 +/- 100,
+        //in other words between 1100 and 1000 milliseconds; 95% of values will fall between 900 and 1300 milliseconds.
         //We can argue about (and calculate from actual measurements) what a realistic standard deviation is, but in any case,
         //the result is going to be more realistic than calling nextInt(1000) and allowing, say, a time of 50ms to have the
-        //same likelihood as a time of 500ms.
+        //same likelihood as a time of 1000ms.
         Random r = new Random();
         long delay;
         do {
