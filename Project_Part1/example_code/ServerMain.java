@@ -30,6 +30,7 @@ public class ServerMain {
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException,
             InvalidKeySpecException, NoSuchPaddingException,
             IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+
         File decryptedFile = new File("test_file-decrypted-server.pdf");
         File networkFile = new File("temp-server.pdf");
 
@@ -52,17 +53,7 @@ public class ServerMain {
         long fileLength = request.getLengthFile();
 
         FileManagement.receiveFile(inputStream, outFile, fileLength);
-        /*
-        int readFromFile = 0;
-        int bytesRead = 0;
-        byte[] readBuffer = new byte[64];
 
-        System.out.println("[Server] File length: "+ fileLength);
-        while((readFromFile < fileLength)){
-            bytesRead = inputStream.read(readBuffer);
-            readFromFile += bytesRead;
-            outFile.write(readBuffer, 0, bytesRead);
-        }*/
 
         System.out.println("File length: " + networkFile.length());
 
@@ -77,14 +68,6 @@ public class ServerMain {
         outSocket.writeLong(decryptedFile.length());
         outSocket.flush();
         FileManagement.sendFile(inDecrypted, outSocket);
-        /*
-        int readCount;
-        byte[] buffer = new byte[64];
-        //read from the file and send it in the socket
-        while ((readCount = inDecrypted.read(buffer)) > 0){
-            outSocket.write(buffer, 0, readCount);
-        }*/
-
         dataInputStream.close();
         inputStream.close();
         inDecrypted.close();
