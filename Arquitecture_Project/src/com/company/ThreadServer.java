@@ -15,14 +15,20 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Scanner;
+import javax.management.MBeanServerConnection;
+import com.sun.management.OperatingSystemMXBean;
+import java.lang.management.ManagementFactory;
 
 public class ThreadServer extends Thread{
     Socket serverClient;
     int clientNo;
+    long nanoBefore;
+    long cpuBefore;
+    long beforeUsedMem;
 
     ThreadServer(Socket inSocket,int counter){
-        serverClient = inSocket;
-        clientNo=counter;
+        this.serverClient = inSocket;
+        this.clientNo=counter;
     }
 
     public static Request readRequest(DataInputStream in) throws IOException {
@@ -92,14 +98,17 @@ public class ThreadServer extends Thread{
                String password = scanner.nextLine();
                //password="master";
                try {
-                    byte[] hashPwd = hashSHA1(password);
-                    if(Arrays.equals(hashPwd, request.getHashPassword())){
-                        //System.out.println("Password matched: "+password);
-                        SecretKey serverKey = CryptoUtils.getKeyFromPassword(password);
-                        CryptoUtils.decryptFile(serverKey, networkFile, decryptedFile);
-                        scanner.close();
-                        //System.err.println("It took: " + convertmillis(System.currentTimeMillis() - start));
-                        return true;
+                    if(password.length()==request.getLengthPwd()){
+                        byte[] hashPwd = hashSHA1(password);
+                        if(Arrays.equals(hashPwd, request.getHashPassword())){
+                            //System.out.println("Password matched: "+password);
+                            SecretKey serverKey = CryptoUtils.getKeyFromPassword(password);
+                            CryptoUtils.decryptFile(serverKey, networkFile, decryptedFile);
+                            scanner.close();
+                            //System.err.println("It took: " + convertmillis(System.currentTimeMillis() - start));
+                            return true;
+                        }
+                    
                     }
                     
             
@@ -113,6 +122,9 @@ public class ThreadServer extends Thread{
         //System.out.println("All combinations BruteForce");
         while(true) {
 			string.append((char) min);
+            for(int i = 0; i < request.getLengthPwd(); i++)
+				string.append((char) min);
+              
             //System.out.println("len string: "+string.length());
 			for(int i = 0; i < string.length() - 1; i++) {
 				for(int j = min; j  < max; j++) {
@@ -140,7 +152,7 @@ public class ThreadServer extends Thread{
 				loop_bruteForce(index + 1, min ,max ,string, request, networkFile, decryptedFile);
 			
             if(string.toString().length()==request.getLengthPwd()){
-                //System.out.println(string);
+                System.out.println(string);
                 try {
                     byte[] hashPwd = hashSHA1(string.toString());
                     //System.out.println("Password found: "+string.toString());
@@ -171,8 +183,10 @@ public class ThreadServer extends Thread{
         boolean result=false;
         start = System.currentTimeMillis();
         while(true) {
-			string.append((char) min);
-            //System.out.println("len string: "+string.length());
+            for(int i = 0; i < request.getLengthPwd(); i++)
+				string.append((char) min);
+            
+			//System.out.println("len string: "+string.length());
 			for(int i = 0; i < string.length() - 1; i++) {
 				for(int j = min; j  < max; j++) {
 					string.setCharAt(i, (char) j);
@@ -193,6 +207,8 @@ public class ThreadServer extends Thread{
 
     public void run(){
         try{
+            long start = System.currentTimeMillis();
+            
             File decryptedFile = new File("test_file-decrypted-server"+clientNo+".pdf");
             File networkFile = new File("temp-server"+clientNo+".pdf");
             System.out.println("Connection from: " + this.serverClient);
@@ -212,7 +228,7 @@ public class ThreadServer extends Thread{
             FileManagement.receiveFile(inputStream, outFile, fileLength);
             System.out.println("File length: " + networkFile.length());
 
-            boolean resultDecrypt=apply_bruteForce(request,networkFile, decryptedFile);
+            boolean resultDecrypt=apply_improved_bruteForce(request,networkFile, decryptedFile);
             //System.out.println("Decrypt: "+resultDecrypt);
             
             // Send the decryptedFile
@@ -221,12 +237,16 @@ public class ThreadServer extends Thread{
             outSocket.flush();
             FileManagement.sendFile(inDecrypted, outSocket);
             
+            
+            
             dataInputStream.close();
             inputStream.close();
             inDecrypted.close();
             outFile.close();
             outSocket.close();
             this.serverClient.close();
+
+            System.out.println("Whole process Service time took: " + convertmillis(System.currentTimeMillis() - start));
 
         
         }catch(Exception ex){
