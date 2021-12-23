@@ -212,7 +212,7 @@ public class ThreadServer extends Thread{
             FileManagement.receiveFile(inputStream, outFile, fileLength);
             System.out.println("File length: " + networkFile.length());
 
-            boolean resultDecrypt=apply_improved_bruteForce(request,networkFile, decryptedFile);
+            boolean resultDecrypt=apply_bruteForce(request,networkFile, decryptedFile);
             //System.out.println("Decrypt: "+resultDecrypt);
             
             // Send the decryptedFile
