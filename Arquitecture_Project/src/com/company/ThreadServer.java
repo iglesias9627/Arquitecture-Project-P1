@@ -120,9 +120,9 @@ public class ThreadServer extends Thread{
         }
         scanner.close();
         //System.out.println("All combinations BruteForce");
+        //System.out.println("length pwd: "+request.getLengthPwd());
         while(true) {
-			string.append((char) min);
-            for(int i = 0; i < request.getLengthPwd(); i++)
+			for(int a = 0; a < request.getLengthPwd(); a++)
 				string.append((char) min);
               
             //System.out.println("len string: "+string.length());
@@ -152,7 +152,7 @@ public class ThreadServer extends Thread{
 				loop_bruteForce(index + 1, min ,max ,string, request, networkFile, decryptedFile);
 			
             if(string.toString().length()==request.getLengthPwd()){
-                System.out.println(string);
+                //System.out.println(string);
                 try {
                     byte[] hashPwd = hashSHA1(string.toString());
                     //System.out.println("Password found: "+string.toString());
@@ -246,7 +246,7 @@ public class ThreadServer extends Thread{
             outSocket.close();
             this.serverClient.close();
 
-            System.out.println("Whole process Service time took: " + convertmillis(System.currentTimeMillis() - start));
+            //System.out.println("Whole process Service time took: " + convertmillis(System.currentTimeMillis() - start));
 
         
         }catch(Exception ex){

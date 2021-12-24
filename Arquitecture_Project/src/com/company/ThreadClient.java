@@ -49,33 +49,62 @@ public class ThreadClient extends Thread{
         out.writeLong(fileLength);
     }
 
+    public static String generate_random_string(int n) {
+		StringBuilder sb = new StringBuilder(n);
+		String alphabet = "abcdefghijklmnopqrstuvxyz";
+        // create StringBuffer size of alphabet
+        for (int i = 0; i < n; i++) {
+            int index = (int)(alphabet.length() * Math.random());
+            // add Character one by one in end of sb
+            sb.append(alphabet.charAt(index));
+        }
+  
+        return sb.toString();
+	}
+    
+
     public static String getRandomPassword() throws IOException {
         String password="";
-        try {
-            Path pathFile =Paths.get("10k-most-common_filered.txt");
-            int lines = (int) Files.lines(pathFile).count();
-            //System.out.println("len: "+lines);
-            
-            while(password.length()!=4){
-                int randomNum = ThreadLocalRandom.current().nextInt(0, lines-1);
-                password = Files.readAllLines(pathFile).get(randomNum);//439//10
+        int min = 0;
+		int max = 1;
+		int random_int = (int)Math.floor(Math.random()*(max-min+1)+min);
+        int len_password=5;
+        //System.out.println("random_int: "+random_int);
+		
+        if(random_int==0){
+            password= generate_random_string(len_password);
+		    //System.out.println("random password: "+password);
+        }
+        else{
+            try {
+                Path pathFile =Paths.get("10k-most-common_filered.txt");
+                int lines = (int) Files.lines(pathFile).count();
+                //System.out.println("len: "+lines);
+                
+                while(password.length()!=len_password){
+                    int randomNum = ThreadLocalRandom.current().nextInt(0, lines-1);
+                    password = Files.readAllLines(pathFile).get(randomNum);//439//10
+                }
+                
+                //System.out.println("pwd line: "+password);
+                //System.out.println("pwd len: "+password.length());
+            } catch (FileNotFoundException e) {
+                System.out.println("An error occurred.");
+                e.printStackTrace();
             }
             
-            //System.out.println("pwd line: "+password);
-            //System.out.println("pwd len: "+password.length());
-            //myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
+
+
         }
         return password;
     }
+
 
     @Override
     public void run() {
     //public static void main(String[] args) {
         try{
-            //String password = "test";
+            //String password = "michael";
             String password = getRandomPassword();
             SecretKey keyGenerated = CryptoUtils.getKeyFromPassword(password);
 
@@ -91,7 +120,8 @@ public class ThreadClient extends Thread{
 
             // Creating socket to connect to server (in this example it runs on the localhost on port 3333)
             //Socket socket = new Socket("localhost", 3333);
-            //Socket socket = new Socket("192.168.43.57", 3333);
+            //Socket socket = new Socket("192.168.43.57", 8888);
+            //Socket socket = new Socket("192.168.110.109", 8888);
             Socket socket = new Socket("127.0.0.1",8888);
 
             // For any I/O operations, a stream is needed where the data are read from or written to. Depending on
